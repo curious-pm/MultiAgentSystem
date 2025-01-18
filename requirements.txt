@@ -1,14 +1,17 @@
 # Core Libraries
-crewai==1.0.0  # Replace with the actual version you are using
-whisper==1.0.0  # Replace with the actual version compatible with your code
-yt-dlp==2023.12.30
-beautifulsoup4==4.12.2
-requests==2.31.0
-PyYAML==6.0
-python-dotenv==1.0.0
+crewai==1.0.0            # Framework for managing agents and tasks
+whisper==1.0.0           # Speech-to-text transcription
+yt-dlp==2023.12.30       # Downloads YouTube videos/podcasts
+beautifulsoup4==4.12.2   # Web scraping for website analysis
+requests==2.31.0         # HTTP requests for fetching website content
+PyYAML==6.0              # Parsing YAML configuration files (agents.yml)
+python-dotenv==1.0.0     # Managing environment variables
 
-# Optional Libraries for Enhanced Features
-bs4==0.0.1  # Alias for beautifulsoup4 in some setups
+# Alias for BeautifulSoup (optional in some setups)
+bs4==0.0.1
 
-# Ensure compatibility with your Python version
-numpy>=1.21.6,<=2.0.0
+# Numerical and Computational Libraries
+numpy>=1.21.6,<2.0.0     # Required by Whisper and other libraries
+
+# Additional System-Level Dependency Notes
+ffmpeg                   # System dependency required for yt-dlp (not a Python package)
