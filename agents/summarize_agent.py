@@ -9,7 +9,7 @@ class WebsiteSummaryAgent:
     def __init__(self, config_path: str | Path):
         self.config_path = Path(config_path)
         self._create_agent()
-    
+
     def _create_agent(self):
         """Create the website summary agent with config from YAML"""
         try:
@@ -28,11 +28,11 @@ class WebsiteSummaryAgent:
         except Exception as e:
             logging.error(f"Error creating website summary agent: {str(e)}")
             raise
-    
+
     def _analyze_website(self, url: str) -> str:
         """Tool for analyzing websites and creating descriptions"""
-        logging.info(f"🌐 Analyzing website: {url}")
         try:
+            # Ensure URL is complete
             if not url.startswith(('http://', 'https://')):
                 url = f'https://{url}'
             
@@ -40,20 +40,17 @@ class WebsiteSummaryAgent:
             response = requests.get(url, headers=headers, timeout=10)
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            title = soup.title.string if soup.title else ''
+            # Extract title and meta description
+            title = soup.title.string.strip() if soup.title else ''
             meta_desc = soup.find('meta', attrs={'name': 'description'})
-            description = meta_desc['content'] if meta_desc else ''
+            description = meta_desc['content'].strip() if meta_desc else ''
             
-            summary = description if description else title
-            summary = summary.strip()[:150]
-            
-            logging.info(f"✅ Successfully analyzed {url}")
-            return f"{url}: {summary}"
-            
-        except Exception as e:
-            logging.warning(f"⚠️ Could not analyze {url}: {str(e)}")
+            # Use description or fallback to title
+            summary = description or title
+            return f"{url}: {summary[:150]}"  # Limit summary length
+        except Exception:
             return f"{url}: Could not access website"
-    
+
     def task(self) -> Task:
         """Create a website analysis task"""
         return Task(

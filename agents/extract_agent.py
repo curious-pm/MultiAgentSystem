@@ -1,14 +1,14 @@
-from crewai import Agent, Task
 import re
 import yaml
 import logging
+from crewai import Agent, Task
 from pathlib import Path
 
 class URLExtractAgent:
     def __init__(self, config_path: str | Path):
         self.config_path = Path(config_path)
         self._create_agent()
-    
+
     def _create_agent(self):
         """Create the URL extraction agent with config from YAML"""
         try:
@@ -27,16 +27,16 @@ class URLExtractAgent:
         except Exception as e:
             logging.error(f"Error creating URL extraction agent: {str(e)}")
             raise
-    
+
     def _extract_urls(self, text: str) -> list:
         """Tool for extracting URLs from text"""
         logging.info("🔍 Searching for URLs in transcript...")
-        url_pattern = r'(?:https?://)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})+(?:/[^\s]*)?'
-        urls = re.findall(url_pattern, text.lower())
+        url_pattern = r'(https?://[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:/[^\s]*)?)'
+        urls = re.findall(url_pattern, text)
         unique_urls = list(set(urls))
         logging.info(f"✅ Found {len(unique_urls)} unique URLs")
         return unique_urls
-    
+
     def task(self) -> Task:
         """Create a URL extraction task"""
         return Task(

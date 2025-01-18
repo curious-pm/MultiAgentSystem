@@ -18,6 +18,7 @@ from agents.transcribe_agent import TranscriptionAgent
 from agents.extract_agent import URLExtractAgent
 from agents.summarize_agent import WebsiteSummaryAgent
 from agents.file_agent import FileGenerationAgent
+from agents.podcastDownloaderAgent import PodcastDownloaderAgent
 
 # Setup logging
 logging.basicConfig(
@@ -49,67 +50,77 @@ def setup_directories():
     Path("data/output").mkdir(parents=True, exist_ok=True)
     Path("logs").mkdir(exist_ok=True)
 
-def process_podcast(audio_path: str):
+def process_podcast(podcast_link: str):
     """Main function to orchestrate the podcast processing"""
-    logging.info("🚀 Starting podcast processing pipeline")
-    
-    # Validate audio file exists
-    if not Path(audio_path).exists():
-        raise FileNotFoundError(f"Audio file not found: {audio_path}")
+    logging.info("\n\n🚀 Starting podcast processing pipeline\n")
     
     # Load agent configurations
     configs = load_agent_configs()
-    logging.info("📝 Initializing agents with configurations...")
+    logging.info("📝 Initializing agents with configurations...\n")
     
     # Initialize agents
+    downloader_agent = PodcastDownloaderAgent(download_dir="data/input")
     transcription_agent = TranscriptionAgent(config_path=YAML_PATH)
     url_extract_agent = URLExtractAgent(config_path=YAML_PATH)
     website_summary_agent = WebsiteSummaryAgent(config_path=YAML_PATH)
     file_generation_agent = FileGenerationAgent(config_path=YAML_PATH)
     
-    # Create tasks
-    tasks = [
-        transcription_agent.task(audio_path),
-        url_extract_agent.task(),
-        website_summary_agent.task(),
-        file_generation_agent.task()
-    ]
+    # Step 1: Download the podcast
+    print("🔹 **Agent 1: Podcast Downloader**")
+    print("Task: Downloading the podcast audio file...")
+    podcast_path = downloader_agent._download_podcast(podcast_link)
+    print("✅ Podcast downloaded successfully.\n")
     
-    # Create crew
-    crew = Crew(
-        tasks=tasks,
-        agents=[
-            transcription_agent.agent,
-            url_extract_agent.agent,
-            website_summary_agent.agent,
-            file_generation_agent.agent
-        ],
-        process=Process.sequential,
-        verbose=True
-    )
+    # Step 2: Transcribe the podcast
+    print("🔹 **Agent 2: Podcast Transcriber**")
+    print("Task: Transcribing the podcast audio file...")
+    transcription_text = transcription_agent._transcribe_audio(podcast_path)
+    print("✅ Podcast transcribed successfully.\n")
     
-    try:
-        # Execute the crew's tasks
-        result = crew.kickoff()
-        logging.info("✨ Processing complete!")
-        return result
-    except Exception as e:
-        logging.error(f"❌ Error during processing: {str(e)}")
-        raise
+    # Step 3: Extract URLs from the transcription
+    print("🔹 **Agent 3: URL Detective**")
+    print("Task: Extracting URLs from the transcription...")
+    urls = url_extract_agent._extract_urls(transcription_text)
+    print("✅ URLs extracted successfully.\n")
+    
+    # Step 4: Analyze each URL
+    print("🔹 **Agent 4: Website Analyzer**")
+    print("Task: Analyzing the extracted URLs for brief descriptions...")
+    analyzed_urls = [website_summary_agent._analyze_website(url) for url in urls]
+    print("✅ URLs analyzed successfully.\n")
+    
+    # Step 5: Generate the report
+    print("🔹 **Agent 5: Report Generator**")
+    print("Task: Generating a structured report with URLs and descriptions...")
+    report_path = file_generation_agent._generate_file(analyzed_urls)
+    print("✅ Report generated successfully.\n")
+    
+    # Final structured output
+    print("\n✨ **Processing Complete!**")
+    print("📄 Final Output Summary:")
+    print(f"- Total URLs Extracted: {len(urls)}")
+    print(f"- Report Location: {report_path}\n")
+    
+    # Print report contents
+    print("📄 **Report Contents**:\n")
+    with open(report_path, 'r') as report_file:
+        report_content = report_file.read()
+        print(report_content)
+
+    return report_path
 
 if __name__ == "__main__":
     try:
         setup_directories()
         
-        # Audio file path
-        audio_file = "data/input/videoplayback.mp3"
+        # Ask the user for the podcast link
+        podcast_link = input("🔗 Please enter the podcast link (YouTube or direct MP3 link): ").strip()
+        
+        if not podcast_link:
+            raise ValueError("❌ No podcast link provided. Please enter a valid URL.")
         
         # Process the podcast
-        result = process_podcast(audio_file)
-        
-        # Print the final result
-        print("\n🎉 Final Result:")
-        print(result)
+        process_podcast(podcast_link)
         
     except Exception as e:
         logging.error(f"Failed to process podcast: {str(e)}")

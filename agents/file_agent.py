@@ -8,7 +8,7 @@ class FileGenerationAgent:
     def __init__(self, config_path: str | Path):
         self.config_path = Path(config_path)
         self._create_agent()
-    
+
     def _create_agent(self):
         """Create the file generation agent with config from YAML"""
         try:
@@ -27,7 +27,7 @@ class FileGenerationAgent:
         except Exception as e:
             logging.error(f"Error creating file generation agent: {str(e)}")
             raise
-    
+
     def _generate_file(self, content: list) -> str:
         """Tool for generating the final report file"""
         logging.info("📝 Generating report file...")
@@ -48,7 +48,7 @@ class FileGenerationAgent:
         
         logging.info(f"✅ Report saved to: {filename}")
         return str(filename)
-    
+
     def task(self) -> Task:
         """Create a file generation task"""
         return Task(

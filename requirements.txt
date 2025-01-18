@@ -1,0 +1,14 @@
+# Core Libraries
+crewai==1.0.0  # Replace with the actual version you are using
+whisper==1.0.0  # Replace with the actual version compatible with your code
+yt-dlp==2023.12.30
+beautifulsoup4==4.12.2
+requests==2.31.0
+PyYAML==6.0
+python-dotenv==1.0.0
+
+# Optional Libraries for Enhanced Features
+bs4==0.0.1  # Alias for beautifulsoup4 in some setups
+
+# Ensure compatibility with your Python version
+numpy>=1.21.6,<=2.0.0
