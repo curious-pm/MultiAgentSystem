@@ -1,4 +1,5 @@
-[Join Idealabs Community](https://curios.pm) to connect, share, and learn with others!
+# Join the Community
+[Join Community](https://curios.pm) to connect, share, and learn with others!
 
 # Podcast URL Extractor
 This project automates the process of extracting website URLs mentioned in podcast episodes. It leverages AI-powered agents to download, transcribe, analyze, and generate structured reports from podcast audio files.
